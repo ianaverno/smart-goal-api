@@ -15,12 +15,14 @@
 class Goal < ApplicationRecord
   INTERVAL_OPTIONS = ["daily", "weekly", "monthly", "yearly"]
 
-  has_many :stats
+  has_many :stats, dependent: :destroy
 
   validates :description, presence: true
   validates :interval, inclusion: { in: INTERVAL_OPTIONS }
   validates :starting_value, :target_value, numericality: true
   validate  :target_date_in_future?, on: :create
+
+  default_scope { order(created_at: :desc, target_date: :asc) }
 
   def self.interval_options
     INTERVAL_OPTIONS

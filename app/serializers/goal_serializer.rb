@@ -1,0 +1,12 @@
+class GoalSerializer < ActiveModel::Serializer
+  include Rails.application.routes.url_helpers
+
+  attributes :description, :target_date, :interval, 
+    :target_value, :starting_value, :url
+
+  has_many :stats
+
+  def url
+    api_v1_goal_url(object)
+  end
+end

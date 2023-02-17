@@ -15,16 +15,7 @@
 require 'rails_helper'
 
 RSpec.describe Goal, type: :model do
-  subject do
-    described_class.new(
-      description:     'Work more',
-      target_date:     Date.today + 1.year,
-      unit_of_measure: 'hours a day',
-      starting_value:  2.5,
-      target_value:    8,
-      interval:        'daily'
-    )
-  end
+  subject { build(:goal, :valid) }
 
   it 'is valid with valid attributes' do
     expect(subject).to be_valid

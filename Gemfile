@@ -28,7 +28,8 @@ gem 'rack-cors'
 # Use annotate models to see model structure at the top of each model file
 gem 'annotate', '~> 3.2.0'
 
-gem 'jsonapi-rails', '~> 0.4.1'
+# Use AMS for json serialization
+gem 'active_model_serializers', '~> 0.10.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -43,6 +44,12 @@ end
 
 group :test do
   gem 'rspec-rails', '~> 6.0.0'
+  
+  # Use factory_bot for fixtures
+  gem 'factory_bot_rails', '~> 6.2.0'
+
+  # Use timecop to test time-dependent code
+  gem 'timecop', '~> 0.9.6'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

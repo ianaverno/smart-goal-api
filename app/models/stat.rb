@@ -19,4 +19,19 @@
 #
 class Stat < ApplicationRecord
   belongs_to :goal
+
+  validates :value, numericality: true, allow_nil: true
+  validates :date, presence: true
+  validate :historic_data?
+
+  default_scope { order(:date) }
+  scope :due, -> { where('date <= ?', Date.today) }
+
+  private
+
+  def historic_data?
+    if date && date > Date.today && value.present?
+      errors.add(:value, "cannot be set before occurence")
+    end
+  end
 end

@@ -1,24 +1,13 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Assumptions
 
-Things you may want to cover:
+* Stats show progress towards goal, i.e. they are a snapshot and are not cumulative
 
-* Ruby version
+## Dev notes
 
-* System dependencies
+* For MVP goal editing API (and tracking recalculation) is not provided
+  instead members can update goals by deleting and creating new ones with 
+  new relevant values
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* It's a good idea to use DatabaseCleaner with rspec, skipped to save time

@@ -20,5 +20,31 @@
 require 'rails_helper'
 
 RSpec.describe Stat, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  subject { build(:stat, :valid) }
+
+  it 'is valid with valid attributes' do
+    expect(subject).to be_valid
+  end
+
+  it 'belongs to a goal' do
+    subject.goal = nil
+    expect(subject).not_to be_valid
+
+    subject.goal_id = "k233jk12"
+    expect(subject).not_to be_valid
+  end
+
+  it 'has a date' do
+    subject.date = nil
+    expect(subject).not_to be_valid
+  end
+
+  it 'does not allow value tracking if the date is in future' do
+    subject.date = Date.today + 1.day
+    expect(subject).not_to be_valid
+
+    # allow placeholders
+    subject.value = nil
+    expect(subject).to be_valid
+  end
 end

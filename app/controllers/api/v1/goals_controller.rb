@@ -1,21 +1,30 @@
 class Api::V1::GoalsController < ApplicationController
-  before_action :set_goal, only: [:update, :destroy]
+  before_action :set_goal, only: :destroy
 
   def index
-    render jsonapi: Goal.all, include: [:stats],
-      fields: {
-        goals: [:description, :target_date, :interval,
-          :target_value, :starting_value]
-      }
+    @goals = Goal.all.includes(:stats)
+    render json: @goals, include: :stats
   end
 
   def create
-  end
+    @goal = Goal.new(goal_params)
 
-  def update
+    if @goal.save
+      tracker = GoalTracker.new(@goal)
+      tracker.create_tracking_schedule
+
+      render json: @goal, status: :created
+    else
+      render json: @goal.errors, status: :unprocessable_entity
+    end
   end
 
   def destroy
+    if @goal.destroy
+      render json: @goal, status: :ok
+    else
+      render json: @goal.errors
+    end
   end
 
   private
@@ -24,7 +33,8 @@ class Api::V1::GoalsController < ApplicationController
     end
 
     def goal_params
-      params.require(:goal).permit(:description, :target_date, :interval,
-        :target_value, :starting_value)
+      params.require(:data).require(:attributes).permit(
+        :description, :target_date, :interval, :target_value, :starting_value
+      )
     end
 end
