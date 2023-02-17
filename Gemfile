@@ -50,6 +50,9 @@ group :test do
 
   # Use timecop to test time-dependent code
   gem 'timecop', '~> 0.9.6'
+
+  # Test # of queries
+  gem 'db-query-matchers', '~> 0.11.0'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

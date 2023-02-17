@@ -3,63 +3,10 @@ require 'rails_helper'
 RSpec.describe "Api::V1::Goals", type: :request do
   let(:headers) { {"ACCEPT" => "application/json"} }
   let(:body)    { JSON.parse(response.body, symbolize_names: true) }
-  let(:params)  { {data: { type: "goals", attributes: attributes }} }
-
-  describe "GET /index" do
-    let!(:completed_goal) do 
-      Timecop.freeze(Date.today - 3.months) do
-        create :goal, 
-          description: 'Submit essays', 
-          target_date: Date.today + 2.months,
-          unit_of_measure: 'essays',
-          starting_value: 0,
-          target_value: 4,
-          interval: 'weekly'
-      end
-    end
-
-    let!(:started_goal) do
-      Timecop.freeze(Date.today - 3.months) do
-        create :goal, 
-          description: 'Grow my thesis', 
-          target_date: Date.today + 1.year,
-          unit_of_measure: 'pages',
-          starting_value: 1,
-          target_value: 100,
-          interval: 'monthly'
-      end
-    end
-
-    let!(:new_goal) { create :goal, :valid, interval: 'monthly' }
-
-    before(:each) do
-      Goal.find_each do |g|
-        tracker = GoalTracker.new(g)
-        tracker.create_tracking_schedule
-      end
-      
-      next_val = completed_goal.starting_value 
-      completed_goal.stats.each do |s|
-        s.update(value: next_val)
-        next_val += 0.5
-      end
-
-      next_val = 10
-      started_goal.stats.due.each do |s|
-        s.update(value: next_val)
-        next_val += 10
-      end
-    end
-
-    it 'returns goals with stats' do
-      get '/api/v1/goals', headers: headers
-      
-      expect(body)
-    end
-  end
+  let(:params)  { {goal: attributes } }
 
   describe "POST /create" do
-    let(:goal) { Goal.find(body[:data][:id]) }
+    let(:goal) { Goal.find(body[:goal][:id]) }
     
     context 'with interval set to daily' do
       let(:attributes) do
@@ -207,11 +154,11 @@ RSpec.describe "Api::V1::Goals", type: :request do
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(response).to have_http_status(:unprocessable_entity)
 
-        expect(body[:description]).to contain_exactly("can't be blank")
-        expect(body[:target_date]).to contain_exactly("should be in the future")
-        expect(body[:starting_value]).to contain_exactly("is not a number")
-        expect(body[:target_value]).to contain_exactly("is not a number")
-        expect(body[:interval]).to contain_exactly("is not included in the list")     
+        expect(body[:errors][:description]).to contain_exactly("can't be blank")
+        expect(body[:errors][:target_date]).to contain_exactly("should be in the future")
+        expect(body[:errors][:starting_value]).to contain_exactly("is not a number")
+        expect(body[:errors][:target_value]).to contain_exactly("is not a number")
+        expect(body[:errors][:interval]).to contain_exactly("is not included in the list")     
       end
     end
   end
@@ -247,6 +194,90 @@ RSpec.describe "Api::V1::Goals", type: :request do
         expect(Goal.count).to eq(1)
         expect(goal.stats.count).to be > 0
       end
+    end
+  end
+
+  describe "GET /index" do
+    let!(:new_goal) { create :goal, :valid, interval: 'monthly' }
+
+    let!(:completed_goal) do 
+      Timecop.freeze(Date.today - 3.months) do
+        create :goal, 
+          description: 'Submit essays', 
+          target_date: Date.today + 2.months,
+          unit_of_measure: 'essays',
+          starting_value: 0,
+          target_value: 4,
+          interval: 'weekly'
+      end
+    end
+
+    let!(:started_goal) do
+      Timecop.freeze(Date.today - 3.months) do
+        create :goal, 
+          description: 'Grow my thesis', 
+          target_date: Date.today + 1.year,
+          unit_of_measure: 'pages',
+          starting_value: 1,
+          target_value: 100,
+          interval: 'monthly'
+      end
+    end
+
+    ## expect non-nil urls only for stats that are past due
+    let(:new_goal_stat_urls_json) { Array.new(12, nil) }
+
+    let(:completed_goal_stat_urls_json) do
+      completed_goal.stats.map { |s| api_v1_goal_stat_url(completed_goal, s) }
+    end
+
+    let(:started_goal_stat_urls_json) do 
+      due_stats = started_goal.stats.first(3).map do |s| 
+        api_v1_goal_stat_url(started_goal, s) 
+      end
+
+      return due_stats + Array.new(9, nil)
+    end
+    ##
+
+    before(:each) do
+      Goal.find_each do |g|
+        tracker = GoalTracker.new(g)
+        tracker.create_tracking_schedule
+      end
+      
+      next_val = completed_goal.starting_value 
+      completed_goal.stats.each do |s|
+        s.update(value: next_val)
+        next_val += 0.5
+      end
+
+      next_val = 10
+      started_goal.stats.due.each do |s|
+        s.update(value: next_val)
+        next_val += 10
+      end
+    end
+
+    it 'returns goals with delete urls and related stats with update url' do
+      expect { get '/api/v1/goals', headers: headers }.to make_database_queries(count: 2)
+
+      expect(body[:goals].length).to eq(3)
+      expect(body[:goals][0][:id]).to eq(new_goal.id)
+      expect(body[:goals][0][:url]).to eq(api_v1_goal_url(new_goal))
+      expect(body[:goals][0][:stats].map {|s| s[:url]})
+        .to match_array(new_goal_stat_urls_json)
+
+      expect(body[:goals][1][:id]).to eq(completed_goal.id)
+      expect(body[:goals][1][:url]).to eq(api_v1_goal_url(completed_goal))
+      expect(body[:goals][1][:stats].map {|s| s[:url]})
+        .to match_array(completed_goal_stat_urls_json)
+
+
+      expect(body[:goals][2][:id]).to eq(started_goal.id)
+      expect(body[:goals][2][:url]).to eq(api_v1_goal_url(started_goal))
+      expect(body[:goals][2][:stats].map {|s| s[:url]})
+        .to match_array(started_goal_stat_urls_json)
     end
   end
 end

@@ -27,11 +27,14 @@ class Stat < ApplicationRecord
   default_scope { order(:date) }
   scope :due, -> { where('date <= ?', Date.today) }
 
-  private
-
-  def historic_data?
-    if date && date > Date.today && value.present?
-      errors.add(:value, "cannot be set before occurence")
-    end
+  def due?
+    date <= Date.today
   end
+
+  private
+    def historic_data?
+      if date && date > Date.today && value.present?
+        errors.add(:value, "cannot be set before occurence")
+      end
+    end
 end

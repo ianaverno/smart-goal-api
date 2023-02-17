@@ -15,7 +15,7 @@ class Api::V1::GoalsController < ApplicationController
 
       render json: @goal, status: :created
     else
-      render json: @goal.errors, status: :unprocessable_entity
+      render json: { errors: @goal.errors }, status: :unprocessable_entity
     end
   end
 
@@ -33,7 +33,7 @@ class Api::V1::GoalsController < ApplicationController
     end
 
     def goal_params
-      params.require(:data).require(:attributes).permit(
+      params.require(:goal).permit(
         :description, :target_date, :interval, :target_value, :starting_value
       )
     end

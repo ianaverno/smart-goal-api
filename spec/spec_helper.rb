@@ -45,7 +45,7 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
   config.before(:each, type: :request) do
-    host! 'localhost:3000'
+    host! 'www.example.com'
   end
 
 # The settings below are suggested to provide a good initial experience

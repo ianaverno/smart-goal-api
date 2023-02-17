@@ -29,10 +29,9 @@ class Goal < ApplicationRecord
   end
 
   private
-
-  def target_date_in_future?
-    unless target_date && target_date > Date.today
-      errors.add(:target_date, "should be in the future")
+    def target_date_in_future?
+      unless target_date && target_date > Date.today
+        errors.add(:target_date, "should be in the future")
+      end
     end
-  end
 end
