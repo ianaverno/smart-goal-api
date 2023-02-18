@@ -10,7 +10,6 @@ class Api::V1::StatsController < ApplicationController
   end
 
   private 
-
     def set_stat
       goal = Goal.find(params[:goal_id])
       @stat = goal.stats.find(params[:id])

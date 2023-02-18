@@ -10,4 +10,4 @@
   instead members can update goals by deleting and creating new ones with 
   new relevant values
 
-* It's a good idea to use DatabaseCleaner with rspec, skipped to save time
+* It's a good idea to use DatabaseCleaner with RSpec, skipped to save time
