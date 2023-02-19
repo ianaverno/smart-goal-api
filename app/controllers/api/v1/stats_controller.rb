@@ -5,7 +5,7 @@ class Api::V1::StatsController < ApplicationController
     if @stat.update(stat_params)
       render json: @stat, status: :ok
     else
-      render json: { errors: @stat.errors }, status: :unprocessable_entity
+      render json: { error: 'update failed', details: @stat.errors }, status: :unprocessable_entity
     end
   end
 

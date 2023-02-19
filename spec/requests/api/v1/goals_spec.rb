@@ -154,11 +154,12 @@ RSpec.describe "Api::V1::Goals", type: :request do
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(response).to have_http_status(:unprocessable_entity)
 
-        expect(body[:errors][:description]).to contain_exactly("can't be blank")
-        expect(body[:errors][:target_date]).to contain_exactly("should be in the future")
-        expect(body[:errors][:starting_value]).to contain_exactly("is not a number")
-        expect(body[:errors][:target_value]).to contain_exactly("is not a number")
-        expect(body[:errors][:interval]).to contain_exactly("is not included in the list")     
+        expect(body[:error]).to eq "create failed"
+        expect(body[:details][:description]).to contain_exactly("can't be blank")
+        expect(body[:details][:target_date]).to contain_exactly("should be in the future")
+        expect(body[:details][:starting_value]).to contain_exactly("is not a number")
+        expect(body[:details][:target_value]).to contain_exactly("is not a number")
+        expect(body[:details][:interval]).to contain_exactly("is not included in the list")     
       end
     end
   end

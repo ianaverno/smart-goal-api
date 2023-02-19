@@ -7,6 +7,7 @@ class GoalTracker
   }
 
   def initialize(goal)
+    puts goal.inspect
     @goal = goal
   end
 

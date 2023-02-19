@@ -15,7 +15,7 @@ class Api::V1::GoalsController < ApplicationController
 
       render json: @goal, status: :created
     else
-      render json: { errors: @goal.errors }, status: :unprocessable_entity
+      render json: { error: 'create failed', details: @goal.errors }, status: :unprocessable_entity
     end
   end
 

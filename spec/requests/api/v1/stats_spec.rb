@@ -31,7 +31,9 @@ RSpec.describe "Api::V1::Stats", type: :request do
 
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(body[:errors][:value]).to contain_exactly("cannot be set before occurence")
+
+        expect(body[:error]).to eq 'update failed'
+        expect(body[:details][:value]).to contain_exactly("cannot be set before occurence")
 
         expect(stat.reload.value).to be(nil)
       end

@@ -6,4 +6,6 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  match "*rest", to: "errors#not_found", via: :get, as: :page_404
 end
