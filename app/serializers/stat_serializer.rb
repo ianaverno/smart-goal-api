@@ -1,7 +1,7 @@
 class StatSerializer < ActiveModel::Serializer
   include Rails.application.routes.url_helpers
 
-  attributes :value, :date, :url
+  attributes :id, :value, :date, :url
 
   def url
     if object.due?

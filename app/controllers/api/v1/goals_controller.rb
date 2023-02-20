@@ -33,8 +33,7 @@ class Api::V1::GoalsController < ApplicationController
     end
 
     def goal_params
-      params.require(:goal).permit(
-        :description, :target_date, :interval, :target_value, :starting_value
-      )
+      params.require(:goal).permit(:description, :target_date, :interval, 
+        :target_value, :starting_value, :unit_of_measure)
     end
 end
